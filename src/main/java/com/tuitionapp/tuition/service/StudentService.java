@@ -108,16 +108,13 @@ public class StudentService {
         return studentRepository.findByName(name);
     }
 
-    // Check if student exists by roll number
+    // Check if student exists by roll number - Fixed: Use database query instead of fetching all
     public boolean existsByRollNumber(String rollNumber) {
-        return studentRepository.findAll().stream()
-                .anyMatch(student -> rollNumber.equals(student.getRollNumber()));
+        return studentRepository.existsByRollNumber(rollNumber);
     }
 
-    // Get students by class
+    // Get students by class - Fixed: Use database query instead of in-memory filtering
     public List<Student> getStudentsByClass(String className) {
-        return studentRepository.findAll().stream()
-                .filter(student -> className.equals(student.getClassName()))
-                .collect(Collectors.toList());
+        return studentRepository.findByClassName(className);
     }
 }

@@ -8,4 +8,6 @@ import java.util.List; // ✅ Make sure this is included!
 
 public interface StudentRepository extends JpaRepository<Student, Long> {
     List<Student> findByName(String name);
+    boolean existsByRollNumber(String rollNumber);
+    List<Student> findByClassName(String className);
 }
