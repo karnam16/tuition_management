@@ -1,0 +1,366 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] -----------------------< com.tuitionapp:tuition >-----------------------
+[INFO] Building tuition 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] >>> spring-boot:3.5.3:run (default-cli) > test-compile @ tuition >>>
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ tuition ---
+[INFO] Copying 2 resources from src/main/resources to target/classes
+[INFO] Copying 1 resource from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.14.0:compile (default-compile) @ tuition ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ tuition ---
+[INFO] skip non existing resourceDirectory /workspace/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.14.0:testCompile (default-testCompile) @ tuition ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] <<< spring-boot:3.5.3:run (default-cli) < test-compile @ tuition <<<
+[INFO] 
+[INFO] 
+[INFO] --- spring-boot:3.5.3:run (default-cli) @ tuition ---
+[INFO] Attaching agents: []
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.5.3)
+
+2025-07-26T16:45:27.336Z  INFO 5049 --- [tuition] [  restartedMain] c.tuitionapp.tuition.TuitionApplication  : Starting TuitionApplication using Java 21.0.7 with PID 5049 (/workspace/target/classes started by ubuntu in /workspace)
+2025-07-26T16:45:27.337Z  INFO 5049 --- [tuition] [  restartedMain] c.tuitionapp.tuition.TuitionApplication  : The following 1 profile is active: "demo"
+2025-07-26T16:45:27.360Z  INFO 5049 --- [tuition] [  restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2025-07-26T16:45:27.360Z  INFO 5049 --- [tuition] [  restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2025-07-26T16:45:27.662Z  INFO 5049 --- [tuition] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-07-26T16:45:27.690Z  INFO 5049 --- [tuition] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 23 ms. Found 2 JPA repository interfaces.
+2025-07-26T16:45:27.931Z  INFO 5049 --- [tuition] [  restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2025-07-26T16:45:27.939Z  INFO 5049 --- [tuition] [  restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-07-26T16:45:27.939Z  INFO 5049 --- [tuition] [  restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.42]
+2025-07-26T16:45:27.955Z  INFO 5049 --- [tuition] [  restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-07-26T16:45:27.956Z  INFO 5049 --- [tuition] [  restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 594 ms
+2025-07-26T16:45:28.040Z  INFO 5049 --- [tuition] [  restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-07-26T16:45:28.059Z  INFO 5049 --- [tuition] [  restartedMain] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.18.Final
+2025-07-26T16:45:28.072Z  INFO 5049 --- [tuition] [  restartedMain] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-07-26T16:45:28.185Z  INFO 5049 --- [tuition] [  restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-07-26T16:45:28.197Z  INFO 5049 --- [tuition] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-07-26T16:45:28.301Z  INFO 5049 --- [tuition] [  restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:tuitiondb user=SA
+2025-07-26T16:45:28.302Z  INFO 5049 --- [tuition] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-07-26T16:45:28.313Z  WARN 5049 --- [tuition] [  restartedMain] org.hibernate.orm.deprecation            : HHH90000025: H2Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-07-26T16:45:28.322Z  INFO 5049 --- [tuition] [  restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 2.3.232
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-07-26T16:45:28.725Z  INFO 5049 --- [tuition] [  restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-07-26T16:45:28.733Z DEBUG 5049 --- [tuition] [  restartedMain] org.hibernate.SQL                        : 
+    drop table if exists fee_records cascade 
+Hibernate: 
+    drop table if exists fee_records cascade 
+2025-07-26T16:45:28.736Z DEBUG 5049 --- [tuition] [  restartedMain] org.hibernate.SQL                        : 
+    drop table if exists student cascade 
+Hibernate: 
+    drop table if exists student cascade 
+2025-07-26T16:45:28.739Z DEBUG 5049 --- [tuition] [  restartedMain] org.hibernate.SQL                        : 
+    create table fee_records (
+        amount numeric(10,2) not null,
+        due_date date not null,
+        paid_date date,
+        id bigint generated by default as identity,
+        student_id bigint not null,
+        transaction_id varchar(100),
+        remarks varchar(500),
+        payment_method enum ('CASH','GPAY','PAYTM','PHONEPE','UPI'),
+        status enum ('DUE','OVERDUE','PAID') not null,
+        primary key (id)
+    )
+Hibernate: 
+    create table fee_records (
+        amount numeric(10,2) not null,
+        due_date date not null,
+        paid_date date,
+        id bigint generated by default as identity,
+        student_id bigint not null,
+        transaction_id varchar(100),
+        remarks varchar(500),
+        payment_method enum ('CASH','GPAY','PAYTM','PHONEPE','UPI'),
+        status enum ('DUE','OVERDUE','PAID') not null,
+        primary key (id)
+    )
+2025-07-26T16:45:28.745Z DEBUG 5049 --- [tuition] [  restartedMain] org.hibernate.SQL                        : 
+    create table student (
+        discount_percent numeric(38,2),
+        joining_date date,
+        monthly_fee numeric(38,2),
+        id bigint generated by default as identity,
+        class_name varchar(255),
+        department varchar(255),
+        email varchar(255),
+        name varchar(255),
+        parent_email varchar(255),
+        parent_name varchar(255),
+        parent_phone varchar(255),
+        phone varchar(255),
+        roll_number varchar(255),
+        primary key (id)
+    )
+Hibernate: 
+    create table student (
+        discount_percent numeric(38,2),
+        joining_date date,
+        monthly_fee numeric(38,2),
+        id bigint generated by default as identity,
+        class_name varchar(255),
+        department varchar(255),
+        email varchar(255),
+        name varchar(255),
+        parent_email varchar(255),
+        parent_name varchar(255),
+        parent_phone varchar(255),
+        phone varchar(255),
+        roll_number varchar(255),
+        primary key (id)
+    )
+2025-07-26T16:45:28.747Z DEBUG 5049 --- [tuition] [  restartedMain] org.hibernate.SQL                        : 
+    alter table if exists fee_records 
+       add constraint FK6pgdupqku702l9u0k4p2mg3lm 
+       foreign key (student_id) 
+       references student
+Hibernate: 
+    alter table if exists fee_records 
+       add constraint FK6pgdupqku702l9u0k4p2mg3lm 
+       foreign key (student_id) 
+       references student
+2025-07-26T16:45:28.758Z  INFO 5049 --- [tuition] [  restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-07-26T16:45:28.946Z  INFO 5049 --- [tuition] [  restartedMain] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+✅ StudentController loaded successfully!
+2025-07-26T16:45:29.290Z  WARN 5049 --- [tuition] [  restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-07-26T16:45:29.302Z  INFO 5049 --- [tuition] [  restartedMain] o.s.b.a.w.s.WelcomePageHandlerMapping    : Adding welcome page: class path resource [static/index.html]
+2025-07-26T16:45:29.425Z  INFO 5049 --- [tuition] [  restartedMain] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2-console'. Database available at 'jdbc:h2:mem:tuitiondb'
+2025-07-26T16:45:29.461Z  INFO 5049 --- [tuition] [  restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2025-07-26T16:45:29.475Z  INFO 5049 --- [tuition] [  restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2025-07-26T16:45:29.480Z  INFO 5049 --- [tuition] [  restartedMain] c.tuitionapp.tuition.TuitionApplication  : Started TuitionApplication in 2.365 seconds (process running for 2.553)
+2025-07-26T16:45:40.573Z  INFO 5049 --- [tuition] [nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-07-26T16:45:40.574Z  INFO 5049 --- [tuition] [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2025-07-26T16:45:40.575Z  INFO 5049 --- [tuition] [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2025-07-26T16:45:40.649Z DEBUG 5049 --- [tuition] [nio-8080-exec-1] org.hibernate.SQL                        : 
+    insert 
+    into
+        student
+        (class_name, department, discount_percent, email, joining_date, monthly_fee, name, parent_email, parent_name, parent_phone, phone, roll_number, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, default)
+Hibernate: 
+    insert 
+    into
+        student
+        (class_name, department, discount_percent, email, joining_date, monthly_fee, name, parent_email, parent_name, parent_phone, phone, roll_number, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, default)
+2025-07-26T16:45:40.674Z DEBUG 5049 --- [tuition] [nio-8080-exec-1] org.hibernate.SQL                        : 
+    insert 
+    into
+        fee_records
+        (amount, due_date, paid_date, payment_method, remarks, status, student_id, transaction_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, default)
+Hibernate: 
+    insert 
+    into
+        fee_records
+        (amount, due_date, paid_date, payment_method, remarks, status, student_id, transaction_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, default)
+2025-07-26T16:45:40.706Z DEBUG 5049 --- [tuition] [nio-8080-exec-2] org.hibernate.SQL                        : 
+    insert 
+    into
+        student
+        (class_name, department, discount_percent, email, joining_date, monthly_fee, name, parent_email, parent_name, parent_phone, phone, roll_number, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, default)
+Hibernate: 
+    insert 
+    into
+        student
+        (class_name, department, discount_percent, email, joining_date, monthly_fee, name, parent_email, parent_name, parent_phone, phone, roll_number, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, default)
+2025-07-26T16:45:40.707Z DEBUG 5049 --- [tuition] [nio-8080-exec-2] org.hibernate.SQL                        : 
+    insert 
+    into
+        fee_records
+        (amount, due_date, paid_date, payment_method, remarks, status, student_id, transaction_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, default)
+Hibernate: 
+    insert 
+    into
+        fee_records
+        (amount, due_date, paid_date, payment_method, remarks, status, student_id, transaction_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, default)
+2025-07-26T16:45:40.753Z DEBUG 5049 --- [tuition] [nio-8080-exec-5] org.hibernate.SQL                        : 
+    select
+        s1_0.id,
+        s1_0.class_name,
+        s1_0.department,
+        s1_0.discount_percent,
+        s1_0.email,
+        s1_0.joining_date,
+        s1_0.monthly_fee,
+        s1_0.name,
+        s1_0.parent_email,
+        s1_0.parent_name,
+        s1_0.parent_phone,
+        s1_0.phone,
+        s1_0.roll_number 
+    from
+        student s1_0
+Hibernate: 
+    select
+        s1_0.id,
+        s1_0.class_name,
+        s1_0.department,
+        s1_0.discount_percent,
+        s1_0.email,
+        s1_0.joining_date,
+        s1_0.monthly_fee,
+        s1_0.name,
+        s1_0.parent_email,
+        s1_0.parent_name,
+        s1_0.parent_phone,
+        s1_0.phone,
+        s1_0.roll_number 
+    from
+        student s1_0
+2025-07-26T16:45:40.799Z DEBUG 5049 --- [tuition] [nio-8080-exec-7] org.hibernate.SQL                        : 
+    select
+        fr1_0.id,
+        fr1_0.amount,
+        fr1_0.due_date,
+        fr1_0.paid_date,
+        fr1_0.payment_method,
+        fr1_0.remarks,
+        fr1_0.status,
+        fr1_0.student_id,
+        fr1_0.transaction_id 
+    from
+        fee_records fr1_0 
+    where
+        fr1_0.due_date=? 
+        and fr1_0.status=?
+Hibernate: 
+    select
+        fr1_0.id,
+        fr1_0.amount,
+        fr1_0.due_date,
+        fr1_0.paid_date,
+        fr1_0.payment_method,
+        fr1_0.remarks,
+        fr1_0.status,
+        fr1_0.student_id,
+        fr1_0.transaction_id 
+    from
+        fee_records fr1_0 
+    where
+        fr1_0.due_date=? 
+        and fr1_0.status=?
+2025-07-26T16:45:40.811Z  WARN 5049 --- [tuition] [nio-8080-exec-8] .w.s.m.s.DefaultHandlerExceptionResolver : Resolved [org.springframework.web.method.annotation.MethodArgumentTypeMismatchException: Method parameter 'id': Failed to convert value of type 'java.lang.String' to required type 'java.lang.Long'; For input string: "search"]
+2025-07-26T16:45:40.821Z DEBUG 5049 --- [tuition] [nio-8080-exec-9] org.hibernate.SQL                        : 
+    select
+        s1_0.id,
+        s1_0.class_name,
+        s1_0.department,
+        s1_0.discount_percent,
+        s1_0.email,
+        s1_0.joining_date,
+        s1_0.monthly_fee,
+        s1_0.name,
+        s1_0.parent_email,
+        s1_0.parent_name,
+        s1_0.parent_phone,
+        s1_0.phone,
+        s1_0.roll_number 
+    from
+        student s1_0 
+    where
+        s1_0.id=?
+Hibernate: 
+    select
+        s1_0.id,
+        s1_0.class_name,
+        s1_0.department,
+        s1_0.discount_percent,
+        s1_0.email,
+        s1_0.joining_date,
+        s1_0.monthly_fee,
+        s1_0.name,
+        s1_0.parent_email,
+        s1_0.parent_name,
+        s1_0.parent_phone,
+        s1_0.phone,
+        s1_0.roll_number 
+    from
+        student s1_0 
+    where
+        s1_0.id=?
+2025-07-26T16:45:40.828Z DEBUG 5049 --- [tuition] [nio-8080-exec-9] org.hibernate.SQL                        : 
+    update
+        student 
+    set
+        class_name=?,
+        department=?,
+        discount_percent=?,
+        email=?,
+        joining_date=?,
+        monthly_fee=?,
+        name=?,
+        parent_email=?,
+        parent_name=?,
+        parent_phone=?,
+        phone=?,
+        roll_number=? 
+    where
+        id=?
+Hibernate: 
+    update
+        student 
+    set
+        class_name=?,
+        department=?,
+        discount_percent=?,
+        email=?,
+        joining_date=?,
+        monthly_fee=?,
+        name=?,
+        parent_email=?,
+        parent_name=?,
+        parent_phone=?,
+        phone=?,
+        roll_number=? 
+    where
+        id=?
+2025-07-26T16:45:40.836Z  INFO 5049 --- [tuition] [ionShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-07-26T16:45:40.840Z  INFO 5049 --- [tuition] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-07-26T16:45:40.843Z  INFO 5049 --- [tuition] [ionShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-07-26T16:45:40.844Z DEBUG 5049 --- [tuition] [ionShutdownHook] org.hibernate.SQL                        : 
+    drop table if exists fee_records cascade 
+Hibernate: 
+    drop table if exists fee_records cascade 
+2025-07-26T16:45:40.845Z DEBUG 5049 --- [tuition] [ionShutdownHook] org.hibernate.SQL                        : 
+    drop table if exists student cascade 
+Hibernate: 
+    drop table if exists student cascade 
+2025-07-26T16:45:40.849Z  WARN 5049 --- [tuition] [ionShutdownHook] o.s.b.f.support.DisposableBeanAdapter    : Invocation of destroy method failed on bean with name 'inMemoryDatabaseShutdownExecutor': org.h2.jdbc.JdbcSQLNonTransientConnectionException: Database is already closed (to disable automatic closing at VM shutdown, add ";DB_CLOSE_ON_EXIT=FALSE" to the db URL) [90121-232]
+2025-07-26T16:45:40.849Z  INFO 5049 --- [tuition] [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-07-26T16:45:40.850Z  INFO 5049 --- [tuition] [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
