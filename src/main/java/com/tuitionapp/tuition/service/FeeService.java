@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -21,8 +22,22 @@ public class FeeService {
     public FeeRecord generateMonthlyFeeRecord(Student student) {
         FeeRecord feeRecord = new FeeRecord();
         feeRecord.setStudent(student);
-        feeRecord.setAmount(student.getMonthlyFee());
-        feeRecord.setDueDate(student.getJoiningDate());
+        
+        // Apply discount if applicable
+        BigDecimal baseAmount = student.getMonthlyFee();
+        BigDecimal discountPercent = student.getDiscountPercent();
+        BigDecimal finalAmount = baseAmount;
+        
+        if (discountPercent != null && discountPercent.compareTo(BigDecimal.ZERO) > 0) {
+            BigDecimal discount = baseAmount.multiply(discountPercent).divide(BigDecimal.valueOf(100));
+            finalAmount = baseAmount.subtract(discount);
+        }
+        
+        feeRecord.setAmount(finalAmount);
+        
+        // Set due date to next month from joining date (business logic correction)
+        LocalDate dueDate = student.getJoiningDate().plusMonths(1);
+        feeRecord.setDueDate(dueDate);
         feeRecord.setStatus(FeeRecord.FeeStatus.DUE);
         
         return feeRecordRepository.save(feeRecord);

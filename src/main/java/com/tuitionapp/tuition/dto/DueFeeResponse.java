@@ -48,6 +48,7 @@ public class DueFeeResponse {
             this.rollNumber = student.getRollNumber();
             this.email = student.getEmail();
             this.department = student.getDepartment();
+            this.monthlyFee = student.getMonthlyFee().doubleValue();
             this.dueMessage = message;
         }
     }

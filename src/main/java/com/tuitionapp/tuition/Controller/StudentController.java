@@ -58,6 +58,12 @@ public class StudentController {
     @PutMapping("/{id}")
     public ResponseEntity<Student> updateStudent(@PathVariable Long id,
                                                  @RequestBody Student student) {
+        // Check if student exists before updating
+        Optional<Student> existingStudent = studentService.getStudentById(id);
+        if (existingStudent.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        
         student.setId(id);
         Student updated = studentService.updateStudent(student);
         return ResponseEntity.ok(updated);
