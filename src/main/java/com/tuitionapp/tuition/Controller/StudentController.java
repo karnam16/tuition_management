@@ -1,4 +1,4 @@
-package com.tuitionapp.tuition.Controller;          // ✅ package name = controller (all lowercase)
+package com.tuitionapp.tuition.Controller;
 
 import com.tuitionapp.tuition.dto.DueFeeResponse;
 import com.tuitionapp.tuition.entity.FeeRecord;
@@ -9,14 +9,20 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/students")
-@CrossOrigin(origins = "*")
+@RequestMapping("/api")  // ✅ Changed from "/students" to "/api"
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
+@Validated
 public class StudentController {
 
     // ────────────────── Dependencies ──────────────────
@@ -34,20 +40,24 @@ public class StudentController {
 
     // ────────────────── CRUD End-points ──────────────────
     // CREATE
-    @PostMapping
-    public ResponseEntity<Student> addStudent(@RequestBody Student student) {
-        Student saved = studentService.addStudent(student);
-        return ResponseEntity.ok(saved);
+    @PostMapping("/students")  // ✅ Now creates /api/students
+    public ResponseEntity<?> addStudent(@RequestBody @jakarta.validation.Valid Student student) {
+        try {
+            Student saved = studentService.addStudent(student);
+            return ResponseEntity.ok(saved);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 
     // READ – all
-    @GetMapping
+    @GetMapping("/students")  // ✅ Now creates /api/students
     public ResponseEntity<List<Student>> getAllStudents() {
         return ResponseEntity.ok(studentService.getAllStudents());
     }
 
     // READ – by id
-    @GetMapping("/{id}")
+    @GetMapping("/students/{id}")  // ✅ Now creates /api/students/{id}
     public ResponseEntity<Student> getStudentById(@PathVariable Long id) {
         Optional<Student> opt = studentService.getStudentById(id);
         return opt.map(ResponseEntity::ok)
@@ -55,7 +65,7 @@ public class StudentController {
     }
 
     // UPDATE
-    @PutMapping("/{id}")
+    @PutMapping("/students/{id}")  // ✅ Now creates /api/students/{id}
     public ResponseEntity<Student> updateStudent(@PathVariable Long id,
                                                  @RequestBody Student student) {
         student.setId(id);
@@ -64,7 +74,7 @@ public class StudentController {
     }
 
     // DELETE
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/students/{id}")  // ✅ Now creates /api/students/{id}
     public ResponseEntity<Void> deleteStudent(@PathVariable Long id) {
         studentService.deleteStudent(id);
         return ResponseEntity.noContent().build();
@@ -72,13 +82,13 @@ public class StudentController {
 
     // ────────────────── Fee-related End-points ──────────────────
     // List students whose fees are due today (raw list)
-    @GetMapping("/due-fees")
+    @GetMapping("/students/due-fees")  // ✅ Now creates /api/students/due-fees
     public ResponseEntity<List<Student>> getDueFeesToday() {
         return ResponseEntity.ok(studentService.getStudentsWithDueFeesToday());
     }
 
     // Same list + formatted messages
-    @GetMapping("/due-fees-with-messages")
+    @GetMapping("/students/due-fees-with-messages")  // ✅ Now creates /api/students/due-fees-with-messages
     public ResponseEntity<DueFeeResponse> getDueFeesWithMessages() {
         return ResponseEntity.ok(studentService.getDueFeesWithMessages());
     }
@@ -99,5 +109,16 @@ public class StudentController {
     @GetMapping("/test")
     public ResponseEntity<String> controllerTest() {
         return ResponseEntity.ok("StudentController is working perfectly!");
+    }
+}
+
+@RestControllerAdvice
+class GlobalExceptionHandler {
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<String> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        String errorMsg = ex.getBindingResult().getFieldErrors().stream()
+            .map(error -> error.getField() + ": " + error.getDefaultMessage())
+            .reduce("", (msg, err) -> msg + err + "; ");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMsg);
     }
 }
