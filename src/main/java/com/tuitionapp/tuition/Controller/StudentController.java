@@ -1,124 +1,144 @@
 package com.tuitionapp.tuition.Controller;
 
+import com.tuitionapp.tuition.dto.DashboardStatsDto;
 import com.tuitionapp.tuition.dto.DueFeeResponse;
-import com.tuitionapp.tuition.entity.FeeRecord;
+import com.tuitionapp.tuition.dto.WhatsAppReminderDto;
 import com.tuitionapp.tuition.entity.Student;
-import com.tuitionapp.tuition.repository.FeeRecordRepository;
 import com.tuitionapp.tuition.service.StudentService;
 import jakarta.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api")  // ✅ Changed from "/students" to "/api"
+@RequestMapping("/api")
 @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
-@Validated
 public class StudentController {
 
-    // ────────────────── Dependencies ──────────────────
+    private static final Logger logger = LoggerFactory.getLogger(StudentController.class);
+
     @Autowired
     private StudentService studentService;
 
-    @Autowired
-    private FeeRecordRepository feeRecordRepository;
-
-    // ────────────────── Helper ──────────────────
     @PostConstruct
     public void init() {
-        System.out.println("✅ StudentController loaded successfully!");
+        logger.info("StudentController initialized successfully");
     }
 
-    // ────────────────── CRUD End-points ──────────────────
-    // CREATE
-    @PostMapping("/students")  // ✅ Now creates /api/students
-    public ResponseEntity<?> addStudent(@RequestBody @jakarta.validation.Valid Student student) {
+    // ────────────────── Student CRUD Operations ──────────────────
+    @GetMapping("/students")
+    public ResponseEntity<List<Student>> getAllStudents() {
         try {
-            Student saved = studentService.addStudent(student);
-            return ResponseEntity.ok(saved);
+            List<Student> students = studentService.getAllStudents();
+            logger.debug("Retrieved {} students", students.size());
+            return ResponseEntity.ok(students);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            logger.error("Error fetching all students: {}", e.getMessage(), e);
+            return ResponseEntity.internalServerError().build();
         }
     }
 
-    // READ – all
-    @GetMapping("/students")  // ✅ Now creates /api/students
-    public ResponseEntity<List<Student>> getAllStudents() {
-        return ResponseEntity.ok(studentService.getAllStudents());
+    @PostMapping("/students")
+    public ResponseEntity<Student> addStudent(@RequestBody Student student) {
+        try {
+            Student saved = studentService.addStudent(student);
+            logger.info("Successfully added student with ID: {}", saved.getId());
+            return ResponseEntity.ok(saved);
+        } catch (Exception e) {
+            logger.error("Error adding student: {}", e.getMessage(), e);
+            return ResponseEntity.badRequest().build();
+        }
     }
 
-    // READ – by id
-    @GetMapping("/students/{id}")  // ✅ Now creates /api/students/{id}
+    @GetMapping("/students/{id}")
     public ResponseEntity<Student> getStudentById(@PathVariable Long id) {
-        Optional<Student> opt = studentService.getStudentById(id);
-        return opt.map(ResponseEntity::ok)
-                  .orElseGet(() -> ResponseEntity.notFound().build());
+        try {
+            Optional<Student> student = studentService.getStudentById(id);
+            if (student.isPresent()) {
+                logger.debug("Retrieved student with ID: {}", id);
+                return ResponseEntity.ok(student.get());
+            } else {
+                logger.warn("Student not found with ID: {}", id);
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            logger.error("Error fetching student by ID {}: {}", id, e.getMessage(), e);
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
-    // UPDATE
-    @PutMapping("/students/{id}")  // ✅ Now creates /api/students/{id}
-    public ResponseEntity<Student> updateStudent(@PathVariable Long id,
-                                                 @RequestBody Student student) {
-        student.setId(id);
-        Student updated = studentService.updateStudent(student);
-        return ResponseEntity.ok(updated);
+    @PutMapping("/students/{id}")
+    public ResponseEntity<Student> updateStudent(@PathVariable Long id, @RequestBody Student student) {
+        try {
+            student.setId(id);
+            Student updated = studentService.updateStudent(student);
+            logger.info("Successfully updated student with ID: {}", id);
+            return ResponseEntity.ok(updated);
+        } catch (Exception e) {
+            logger.error("Error updating student with ID {}: {}", id, e.getMessage(), e);
+            return ResponseEntity.badRequest().build();
+        }
     }
 
-    // DELETE
-    @DeleteMapping("/students/{id}")  // ✅ Now creates /api/students/{id}
+    @DeleteMapping("/students/{id}")
     public ResponseEntity<Void> deleteStudent(@PathVariable Long id) {
-        studentService.deleteStudent(id);
-        return ResponseEntity.noContent().build();
+        try {
+            studentService.deleteStudent(id);
+            logger.info("Successfully deleted student with ID: {}", id);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            logger.error("Error deleting student with ID {}: {}", id, e.getMessage(), e);
+            return ResponseEntity.badRequest().build();
+        }
     }
 
-    // ────────────────── Fee-related End-points ──────────────────
-    // List students whose fees are due today (raw list)
-    @GetMapping("/students/due-fees")  // ✅ Now creates /api/students/due-fees
-    public ResponseEntity<List<Student>> getDueFeesToday() {
-        return ResponseEntity.ok(studentService.getStudentsWithDueFeesToday());
+    // ────────────────── Fee-related Operations ──────────────────
+    @GetMapping("/students/{id}/due-fees")
+    public ResponseEntity<List<DueFeeResponse>> getDueFees(@PathVariable Long id) {
+        try {
+            List<DueFeeResponse> dueFees = studentService.getDueFeesForStudent(id);
+            logger.debug("Retrieved {} due fees for student ID: {}", dueFees.size(), id);
+            return ResponseEntity.ok(dueFees);
+        } catch (Exception e) {
+            logger.error("Error fetching due fees for student ID {}: {}", id, e.getMessage(), e);
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
-    // Same list + formatted messages
-    @GetMapping("/students/due-fees-with-messages")  // ✅ Now creates /api/students/due-fees-with-messages
-    public ResponseEntity<DueFeeResponse> getDueFeesWithMessages() {
-        return ResponseEntity.ok(studentService.getDueFeesWithMessages());
+    // ────────────────── Dashboard & Analytics ──────────────────
+    @GetMapping("/dashboard/stats")
+    public ResponseEntity<DashboardStatsDto> getDashboardStats() {
+        try {
+            DashboardStatsDto stats = studentService.getDashboardStats();
+            logger.debug("Retrieved dashboard statistics");
+            return ResponseEntity.ok(stats);
+        } catch (Exception e) {
+            logger.error("Error fetching dashboard stats: {}", e.getMessage(), e);
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @GetMapping("/reminders/whatsapp")
+    public ResponseEntity<List<WhatsAppReminderDto>> getWhatsAppReminders() {
+        try {
+            List<WhatsAppReminderDto> reminders = studentService.getWhatsAppReminders();
+            logger.debug("Retrieved {} WhatsApp reminders", reminders.size());
+            return ResponseEntity.ok(reminders);
+        } catch (Exception e) {
+            logger.error("Error fetching WhatsApp reminders: {}", e.getMessage(), e);
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
     // ────────────────── Debug / Test End-points ──────────────────
-    @GetMapping("/test-fee-repo")
-    public ResponseEntity<String> testFeeRepository() {
-        try {
-            LocalDate today = LocalDate.now();
-            long count = feeRecordRepository
-                    .countByDueDateAndStatus(today, FeeRecord.FeeStatus.DUE);
-            return ResponseEntity.ok("Repository working! Due fees count: " + count);
-        } catch (Exception ex) {
-            return ResponseEntity.ok("Error: " + ex.getMessage());
-        }
-    }
-
-    @GetMapping("/test")
+    @GetMapping("/students/test")
     public ResponseEntity<String> controllerTest() {
+        logger.info("StudentController test endpoint accessed");
         return ResponseEntity.ok("StudentController is working perfectly!");
-    }
-}
-
-@RestControllerAdvice
-class GlobalExceptionHandler {
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<String> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        String errorMsg = ex.getBindingResult().getFieldErrors().stream()
-            .map(error -> error.getField() + ": " + error.getDefaultMessage())
-            .reduce("", (msg, err) -> msg + err + "; ");
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMsg);
     }
 }
