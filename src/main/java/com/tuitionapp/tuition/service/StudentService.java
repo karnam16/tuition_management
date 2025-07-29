@@ -5,6 +5,7 @@ import com.tuitionapp.tuition.entity.FeeRecord;
 import com.tuitionapp.tuition.entity.Student;
 import com.tuitionapp.tuition.repository.FeeRecordRepository;
 import com.tuitionapp.tuition.repository.StudentRepository;
+import com.tuitionapp.tuition.service.FeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +22,9 @@ public class StudentService {
 
     @Autowired
     private FeeRecordRepository feeRecordRepository;
+
+    @Autowired
+    private FeeService feeService;
 
     // ────────────────── CRUD Operations ──────────────────
     public Student addStudent(Student student) {
@@ -68,6 +72,8 @@ public class StudentService {
 
         response.setWhatsappMessages(messages);
         response.setTotalDueCount(studentsWithDueFees.size());
+        // Calculate and set the aggregated due amount using FeeService
+        response.setTotalDueAmount(feeService.getTotalDueAmount());
 
         return response;
     }
