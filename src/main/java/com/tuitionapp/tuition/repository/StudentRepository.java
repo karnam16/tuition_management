@@ -19,6 +19,9 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
     
     // Find by email  
     List<Student> findByEmail(String email);
+
+    // Find by status
+    List<Student> findByStatus(Student.StudentStatus status);
     
     // Use explicit queries for all complex field names to avoid property path issues
     @Query("SELECT s FROM Student s WHERE s.className = :className")

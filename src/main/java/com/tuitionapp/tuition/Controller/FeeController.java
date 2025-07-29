@@ -1,5 +1,6 @@
 package com.tuitionapp.tuition.Controller;
 
+import com.tuitionapp.tuition.dto.CreateFeeRecordDto;
 import com.tuitionapp.tuition.entity.FeeRecord;
 import com.tuitionapp.tuition.service.FeeService;
 import jakarta.annotation.PostConstruct;
@@ -47,9 +48,9 @@ public class FeeController {
     }
 
     @PostMapping("/fees")
-    public ResponseEntity<FeeRecord> addFeeRecord(@RequestBody FeeRecord feeRecord) {
+    public ResponseEntity<FeeRecord> addFeeRecord(@RequestBody CreateFeeRecordDto feeRecordDto) {
         try {
-            FeeRecord saved = feeService.addFeeRecord(feeRecord);
+            FeeRecord saved = feeService.createFeeRecordFromDto(feeRecordDto);
             return ResponseEntity.ok(saved);
         } catch (Exception e) {
             System.err.println("Error adding fee record: " + e.getMessage());
@@ -66,6 +67,51 @@ public class FeeController {
         } catch (Exception e) {
             System.err.println("Error fetching fee by ID: " + e.getMessage());
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PutMapping("/fees/{id}")
+    public ResponseEntity<FeeRecord> updateFeeRecord(@PathVariable Long id, @RequestBody CreateFeeRecordDto feeRecordDto) {
+        try {
+            FeeRecord updated = feeService.updateFeeRecord(id, feeRecordDto);
+            return ResponseEntity.ok(updated);
+        } catch (Exception e) {
+            System.err.println("Error updating fee record: " + e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @DeleteMapping("/fees/{id}")
+    public ResponseEntity<Void> deleteFeeRecord(@PathVariable Long id) {
+        try {
+            feeService.deleteFeeRecord(id);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            System.err.println("Error deleting fee record: " + e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    // ────────────────── Additional Endpoints ──────────────────
+    @GetMapping("/fees/student/{studentId}")
+    public ResponseEntity<List<FeeRecord>> getFeesByStudentId(@PathVariable Long studentId) {
+        try {
+            List<FeeRecord> fees = feeService.getFeesByStudentId(studentId);
+            return ResponseEntity.ok(fees);
+        } catch (Exception e) {
+            System.err.println("Error fetching fees for student: " + e.getMessage());
+            return ResponseEntity.ok(List.of());
+        }
+    }
+
+    @PutMapping("/fees/{id}/pay")
+    public ResponseEntity<FeeRecord> markFeeAsPaid(@PathVariable Long id) {
+        try {
+            FeeRecord paidFee = feeService.markFeeAsPaid(id);
+            return ResponseEntity.ok(paidFee);
+        } catch (Exception e) {
+            System.err.println("Error marking fee as paid: " + e.getMessage());
+            return ResponseEntity.badRequest().build();
         }
     }
 
