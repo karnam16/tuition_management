@@ -8,6 +8,7 @@ import com.tuitionapp.tuition.repository.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -24,6 +25,16 @@ public class StudentService {
 
     // ────────────────── CRUD Operations ──────────────────
     public Student addStudent(Student student) {
+        // Set default values if not provided
+        if (student.getJoiningDate() == null) {
+            student.setJoiningDate(LocalDate.now());
+        }
+        if (student.getStatus() == null) {
+            student.setStatus(Student.StudentStatus.ACTIVE);
+        }
+        if (student.getDiscountPercent() == null) {
+            student.setDiscountPercent(BigDecimal.ZERO);
+        }
         return studentRepository.save(student);
     }
 
@@ -35,47 +46,53 @@ public class StudentService {
         return studentRepository.findById(id);
     }
 
-    public Student updateStudent(Student student) {
+    public Student updateStudent(Long id, Student studentDetails) {
+        Student student = studentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Student not found with id: " + id));
+
+        // Update fields
+        student.setName(studentDetails.getName());
+        student.setPhoneNumber(studentDetails.getPhoneNumber());
+        student.setEmail(studentDetails.getEmail());
+        student.setAddress(studentDetails.getAddress());
+        student.setClassName(studentDetails.getClassName());
+        student.setMonthlyFee(studentDetails.getMonthlyFee());
+        student.setDiscountPercent(studentDetails.getDiscountPercent());
+        student.setStatus(studentDetails.getStatus());
+
         return studentRepository.save(student);
     }
 
     public void deleteStudent(Long id) {
+        if (!studentRepository.existsById(id)) {
+            throw new RuntimeException("Student not found with id: " + id);
+        }
         studentRepository.deleteById(id);
     }
 
     // ────────────────── Fee-related Methods ──────────────────
-    public List<Student> getStudentsWithDueFeesToday() {
-        LocalDate today = LocalDate.now();
-        List<FeeRecord> dueFees = feeRecordRepository.findByDueDateAndStatus(today, FeeRecord.FeeStatus.DUE);
-
-        List<Long> studentIds = dueFees.stream()
-                .map(FeeRecord::getStudentId)
+    public List<Student> getStudentsWithDueFees() {
+        List<FeeRecord> dueFees = feeRecordRepository.findByStatus(FeeRecord.FeeStatus.DUE);
+        return dueFees.stream()
+                .map(FeeRecord::getStudent)
                 .distinct()
                 .collect(Collectors.toList());
-
-        return studentRepository.findAllById(studentIds);
     }
 
     public DueFeeResponse getDueFeesWithMessages() {
-        List<Student> studentsWithDueFees = getStudentsWithDueFeesToday();
-
-        DueFeeResponse response = new DueFeeResponse();
-        response.setStudents(studentsWithDueFees);
-
-        List<String> messages = studentsWithDueFees.stream()
-                .map(this::generateWhatsAppMessage)
+        List<FeeRecord> dueFees = feeRecordRepository.findByStatus(FeeRecord.FeeStatus.DUE);
+        
+        List<String> messages = dueFees.stream()
+                .map(fee -> String.format("Dear %s, your fee of Rs. %.2f is due on %s. Please pay at your earliest convenience.",
+                        fee.getStudent().getName(),
+                        fee.getAmount(),
+                        fee.getDueDate()))
                 .collect(Collectors.toList());
 
-        response.setWhatsappMessages(messages);
-        response.setTotalDueCount(studentsWithDueFees.size());
-
-        return response;
-    }
-
-    private String generateWhatsAppMessage(Student student) {
-        return String.format(
-                "Dear %s, your tuition fee is due today. Please make the payment at your earliest convenience. Thank you!",
-                student.getName());
+        return DueFeeResponse.builder()
+                .dueFees(dueFees)
+                .messages(messages)
+                .build();
     }
 
     // ────────────────── Utility Methods ──────────────────

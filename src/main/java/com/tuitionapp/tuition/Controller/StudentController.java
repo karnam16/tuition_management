@@ -68,8 +68,7 @@ public class StudentController {
     @PutMapping("/students/{id}")  // ✅ Now creates /api/students/{id}
     public ResponseEntity<Student> updateStudent(@PathVariable Long id,
                                                  @RequestBody Student student) {
-        student.setId(id);
-        Student updated = studentService.updateStudent(student);
+        Student updated = studentService.updateStudent(id, student);
         return ResponseEntity.ok(updated);
     }
 
@@ -81,10 +80,10 @@ public class StudentController {
     }
 
     // ────────────────── Fee-related End-points ──────────────────
-    // List students whose fees are due today (raw list)
+    // List students whose fees are due (raw list)
     @GetMapping("/students/due-fees")  // ✅ Now creates /api/students/due-fees
-    public ResponseEntity<List<Student>> getDueFeesToday() {
-        return ResponseEntity.ok(studentService.getStudentsWithDueFeesToday());
+    public ResponseEntity<List<Student>> getDueFees() {
+        return ResponseEntity.ok(studentService.getStudentsWithDueFees());
     }
 
     // Same list + formatted messages

@@ -1,5 +1,6 @@
 package com.tuitionapp.tuition.service;
 
+import com.tuitionapp.tuition.dto.CreateFeeRecordDto;
 import com.tuitionapp.tuition.entity.FeeRecord;
 import com.tuitionapp.tuition.entity.Student;
 import com.tuitionapp.tuition.repository.FeeRecordRepository;
@@ -7,6 +8,7 @@ import com.tuitionapp.tuition.repository.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -32,6 +34,22 @@ public class FeeService {
         return feeRecordRepository.save(feeRecord);
     }
 
+    public FeeRecord createFeeRecordFromDto(CreateFeeRecordDto dto) {
+        Student student = studentRepository.findById(dto.getStudentId())
+                .orElseThrow(() -> new RuntimeException("Student not found with id: " + dto.getStudentId()));
+
+        FeeRecord feeRecord = FeeRecord.builder()
+                .student(student)
+                .amount(dto.getAmount())
+                .dueDate(dto.getDueDate() != null ? dto.getDueDate() : LocalDate.now().plusDays(30))
+                .paymentDate(dto.getPaidDate())
+                .status(dto.getStatus() != null ? dto.getStatus() : FeeRecord.FeeStatus.DUE)
+                .description(dto.getDescription())
+                .build();
+
+        return feeRecordRepository.save(feeRecord);
+    }
+
     public List<FeeRecord> getAllFeeRecords() {
         return feeRecordRepository.findAll();
     }
@@ -44,82 +62,120 @@ public class FeeService {
         return feeRecordRepository.findById(id);
     }
 
-    public FeeRecord updateFeeRecord(FeeRecord feeRecord) {
-        return feeRecordRepository.save(feeRecord);
+    public FeeRecord updateFeeRecord(Long id, CreateFeeRecordDto dto) {
+        FeeRecord existingFee = feeRecordRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Fee record not found with id: " + id));
+
+        // Update student if changed
+        if (dto.getStudentId() != null && !dto.getStudentId().equals(existingFee.getStudent().getId())) {
+            Student student = studentRepository.findById(dto.getStudentId())
+                    .orElseThrow(() -> new RuntimeException("Student not found with id: " + dto.getStudentId()));
+            existingFee.setStudent(student);
+        }
+
+        // Update other fields
+        if (dto.getAmount() != null) {
+            existingFee.setAmount(dto.getAmount());
+        }
+        if (dto.getDueDate() != null) {
+            existingFee.setDueDate(dto.getDueDate());
+        }
+        if (dto.getPaidDate() != null) {
+            existingFee.setPaidDate(dto.getPaidDate());
+        }
+        if (dto.getStatus() != null) {
+            existingFee.setStatus(dto.getStatus());
+        }
+        if (dto.getDescription() != null) {
+            existingFee.setDescription(dto.getDescription());
+        }
+
+        return feeRecordRepository.save(existingFee);
     }
 
     public void deleteFeeRecord(Long id) {
+        if (!feeRecordRepository.existsById(id)) {
+            throw new RuntimeException("Fee record not found with id: " + id);
+        }
         feeRecordRepository.deleteById(id);
     }
 
-    // ────────────────── Fee-specific Operations ──────────────────
     public List<FeeRecord> getFeesByStudentId(Long studentId) {
         return feeRecordRepository.findByStudentId(studentId);
     }
 
-    public FeeRecord markFeeAsPaid(Long id, String paymentMethod) {
-        Optional<FeeRecord> opt = feeRecordRepository.findById(id);
-        if (opt.isPresent()) {
-            FeeRecord fee = opt.get();
-            fee.setStatus(FeeRecord.FeeStatus.PAID);
-            fee.setPaymentDate(LocalDate.now());
-            fee.setPaymentMethod(paymentMethod);
-            return feeRecordRepository.save(fee);
-        }
-        throw new RuntimeException("Fee record not found with id: " + id);
+    public FeeRecord markFeeAsPaid(Long feeId) {
+        FeeRecord feeRecord = feeRecordRepository.findById(feeId)
+                .orElseThrow(() -> new RuntimeException("Fee record not found with id: " + feeId));
+
+        feeRecord.setStatus(FeeRecord.FeeStatus.PAID);
+        feeRecord.setPaidDate(LocalDate.now());
+
+        return feeRecordRepository.save(feeRecord);
     }
 
-    public List<FeeRecord> getTodaysDueFees() {
-        LocalDate today = LocalDate.now();
-        return feeRecordRepository.findByDueDateAndStatus(today, FeeRecord.FeeStatus.DUE);
+    // ────────────────── Analytics & Statistics ──────────────────
+    public BigDecimal getTotalCollectedAmount() {
+        List<FeeRecord> paidFees = feeRecordRepository.findByStatus(FeeRecord.FeeStatus.PAID);
+        return paidFees.stream()
+                .map(FeeRecord::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    public BigDecimal getTotalDueAmount() {
+        List<FeeRecord> dueFees = feeRecordRepository.findByStatus(FeeRecord.FeeStatus.DUE);
+        return dueFees.stream()
+                .map(FeeRecord::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    public long getTotalDueCount() {
+        return feeRecordRepository.countByStatus(FeeRecord.FeeStatus.DUE);
+    }
+
+    public long getTotalPaidCount() {
+        return feeRecordRepository.countByStatus(FeeRecord.FeeStatus.PAID);
     }
 
     public List<FeeRecord> getOverdueFees() {
-        LocalDate today = LocalDate.now();
-        return feeRecordRepository.findOverdueFees(today);
+        return feeRecordRepository.findOverdueFees(LocalDate.now());
     }
 
-    // ────────────────── Financial Calculations ──────────────────
-    public double getTotalDueAmount() {
-        return getDueFees().stream()
-                .mapToDouble(fee -> fee.getAmount() != null ? fee.getAmount() : 0.0)
-                .sum();
+    public List<FeeRecord> getFeesDueToday() {
+        return feeRecordRepository.findByDueDateAndStatus(LocalDate.now(), FeeRecord.FeeStatus.DUE);
     }
 
-    public double getTotalCollectedThisMonth() {
-        LocalDate startOfMonth = LocalDate.now().withDayOfMonth(1);
-        LocalDate endOfMonth = LocalDate.now().withDayOfMonth(LocalDate.now().lengthOfMonth());
-
-        return feeRecordRepository.findAll().stream()
-                .filter(fee -> fee.getPaymentDate() != null)
-                .filter(fee -> !fee.getPaymentDate().isBefore(startOfMonth) &&
-                        !fee.getPaymentDate().isAfter(endOfMonth))
-                .mapToDouble(fee -> fee.getAmount() != null ? fee.getAmount() : 0.0)
-                .sum();
+    public List<FeeRecord> getFeesForDateRange(LocalDate startDate, LocalDate endDate) {
+        return feeRecordRepository.findByDueDateBetween(startDate, endDate);
     }
 
-    public double getTotalCollectedAllTime() {
-        return feeRecordRepository.findAll().stream()
-                .filter(fee -> fee.getStatus() == FeeRecord.FeeStatus.PAID)
-                .mapToDouble(fee -> fee.getAmount() != null ? fee.getAmount() : 0.0)
-                .sum();
+    // ────────────────── Fee Generation ──────────────────
+    public FeeRecord generateMonthlyFeeForStudent(Long studentId) {
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new RuntimeException("Student not found with id: " + studentId));
+
+        // Calculate discounted amount
+        BigDecimal discountAmount = student.getMonthlyFee()
+                .multiply(student.getDiscountPercent())
+                .divide(BigDecimal.valueOf(100));
+        BigDecimal finalAmount = student.getMonthlyFee().subtract(discountAmount);
+
+        FeeRecord feeRecord = FeeRecord.builder()
+                .student(student)
+                .amount(finalAmount)
+                .dueDate(LocalDate.now().plusDays(30))
+                .status(FeeRecord.FeeStatus.DUE)
+                .description("Monthly tuition fee")
+                .build();
+
+        return feeRecordRepository.save(feeRecord);
     }
 
-    // ────────────────── Utility Methods ──────────────────
-    public FeeRecord createMonthlyFeeForStudent(Long studentId, double amount) {
-        Optional<Student> student = studentRepository.findById(studentId);
-        if (student.isPresent()) {
-            FeeRecord feeRecord = new FeeRecord();
-            feeRecord.setStudentId(studentId);
-            feeRecord.setAmount(amount);
-            feeRecord.setDueDate(LocalDate.now().plusDays(30));
-            feeRecord.setStatus(FeeRecord.FeeStatus.DUE);
-            return addFeeRecord(feeRecord);
+    public void generateMonthlyFeesForAllStudents() {
+        List<Student> activeStudents = studentRepository.findByStatus(Student.StudentStatus.ACTIVE);
+        
+        for (Student student : activeStudents) {
+            generateMonthlyFeeForStudent(student.getId());
         }
-        throw new RuntimeException("Student not found with id: " + studentId);
-    }
-
-    public long getTotalDueFeeCount() {
-        return feeRecordRepository.countByStatus(FeeRecord.FeeStatus.DUE);
     }
 }
