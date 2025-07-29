@@ -1,17 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
-  Container, Grid, TextField, MenuItem, Button, Paper, Typography, Alert,
-} from '@mui/material';
-import { studentAPI } from '../services/api.js';
+  Container,
+  Grid,
+  TextField,
+  MenuItem,
+  Button,
+  Paper,
+  Typography,
+  Alert,
+} from "@mui/material";
+import { studentAPI } from "../services/api.js";
+
+const departments = ["Science", "Commerce", "Arts", "General"];
 
 const classes = Array.from({ length: 12 }, (_, i) => `Class ${i + 1}`);
 
 export default function AddStudent() {
   const [form, setForm] = useState({
-    name: '', rollNumber: '', email: '', phone: '',
-    parentName: '', parentPhone: '', className: '',
-    joiningDate: new Date().toISOString().split('T')[0],
-    monthlyFee: 1000, discountPercent: 0,
+    name: "",
+    rollNumber: "",
+    email: "",
+    phone: "",
+    parentName: "",
+    parentPhone: "",
+    className: "",
+    department: "",
+    joiningDate: new Date().toISOString().split("T")[0],
+    monthlyFee: 1000,
+    discountPercent: 0,
   });
   const [msg, setMsg] = useState(null);
   const handle = (e) => setForm({ ...form, [e.target.name]: e.target.value });
@@ -19,11 +35,24 @@ export default function AddStudent() {
   const submit = async (e) => {
     e.preventDefault();
     try {
-      await studentAPI.add(form);
-      setMsg({ type: 'success', text: 'Student added!' });
-      setForm({ ...form, name: '', rollNumber: '' });
+      await studentAPI.addStudent(form);
+      setMsg({ type: "success", text: "Student added!" });
+      setForm({
+        ...form,
+        name: "",
+        rollNumber: "",
+        email: "",
+        phone: "",
+        parentName: "",
+        parentPhone: "",
+        className: "",
+        department: "",
+      });
     } catch (err) {
-      setMsg({ type: 'error', text: err.response?.data || 'Error adding student' });
+      setMsg({
+        type: "error",
+        text: err.response?.data || err.message || "Error adding student",
+      });
     }
   };
 
@@ -34,17 +63,21 @@ export default function AddStudent() {
           ➕ Add New Student
         </Typography>
 
-        {msg && <Alert severity={msg.type} sx={{ mb: 3 }}>{msg.text}</Alert>}
+        {msg && (
+          <Alert severity={msg.type} sx={{ mb: 3 }}>
+            {msg.text}
+          </Alert>
+        )}
 
         <form onSubmit={submit}>
           <Grid container spacing={2}>
             {[
-              ['name',          'Student Name',  'text',  true ],
-              ['rollNumber',    'Roll Number',   'text',  true ],
-              ['email',         'Email',         'email', false],
-              ['phone',         'Student Phone', 'tel',   false],
-              ['parentName',    'Parent Name',   'text',  false],
-              ['parentPhone',   'Parent Phone',  'tel',   true ],
+              ["name", "Student Name", "text", true],
+              ["rollNumber", "Roll Number", "text", true],
+              ["email", "Email", "email", true],
+              ["phone", "Student Phone", "tel", true],
+              ["parentName", "Parent Name", "text", true],
+              ["parentPhone", "Parent Phone", "tel", true],
             ].map(([name, label, type, req]) => (
               <Grid item xs={12} md={6} key={name}>
                 <TextField
@@ -69,7 +102,30 @@ export default function AddStudent() {
                 onChange={handle}
               >
                 <MenuItem value="">None</MenuItem>
-                {classes.map((c) => <MenuItem key={c} value={c}>{c}</MenuItem>)}
+                {classes.map((c) => (
+                  <MenuItem key={c} value={c}>
+                    {c}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+
+            <Grid item xs={12} md={6}>
+              <TextField
+                select
+                name="department"
+                label="Department"
+                fullWidth
+                required
+                value={form.department}
+                onChange={handle}
+              >
+                <MenuItem value="">Select Department</MenuItem>
+                {departments.map((d) => (
+                  <MenuItem key={d} value={d}>
+                    {d}
+                  </MenuItem>
+                ))}
               </TextField>
             </Grid>
 

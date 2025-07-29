@@ -1,32 +1,29 @@
-import axios from 'axios';
+import axios from "axios";
 
 // Base URL for your Spring Boot backend
-const API_BASE_URL = 'http://localhost:8080/api';
+const API_BASE_URL = "http://localhost:8080/api";
 
 // Create axios instance with proper headers
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
   headers: {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json',
+    "Content-Type": "application/json",
+    Accept: "application/json",
   },
   timeout: 10000,
 });
 
-// Request interceptor to ensure JSON content type
+// Request interceptor - SIMPLIFIED
 apiClient.interceptors.request.use(
   (config) => {
-    // Ensure we're sending JSON
-    if (config.data && typeof config.data === 'object') {
-      config.data = JSON.stringify(config.data);
-    }
-    config.headers['Content-Type'] = 'application/json';
-    
-    console.log(`🚀 API Request: ${config.method?.toUpperCase()} ${config.url}`);
+    // Don't manually stringify - let axios handle it
+    console.log(
+      `🚀 API Request: ${config.method?.toUpperCase()} ${config.url}`
+    );
     return config;
   },
   (error) => {
-    console.error('❌ API Request Error:', error);
+    console.error("❌ API Request Error:", error);
     return Promise.reject(error);
   }
 );
@@ -38,7 +35,11 @@ apiClient.interceptors.response.use(
     return response;
   },
   (error) => {
-    console.error('❌ API Response Error:', error.response?.status, error.message);
+    console.error(
+      "❌ API Response Error:",
+      error.response?.status,
+      error.message
+    );
     return Promise.reject(error);
   }
 );
@@ -48,9 +49,10 @@ export const studentAPI = {
   // Get all students
   getAllStudents: async () => {
     try {
-      const response = await apiClient.get('/students');
+      const response = await apiClient.get("/students");
       return response.data;
     } catch (error) {
+      console.error("Failed to fetch students:", error);
       throw new Error(`Failed to fetch students: ${error.message}`);
     }
   },
@@ -58,13 +60,10 @@ export const studentAPI = {
   // Add new student
   addStudent: async (studentData) => {
     try {
-      const response = await apiClient.post('/students', studentData, {
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      });
+      const response = await apiClient.post("/students", studentData);
       return response.data;
     } catch (error) {
+      console.error("Failed to add student:", error);
       throw new Error(`Failed to add student: ${error.message}`);
     }
   },
@@ -72,13 +71,13 @@ export const studentAPI = {
   // Update student
   updateStudent: async (studentId, studentData) => {
     try {
-      const response = await apiClient.put(`/students/${studentId}`, studentData, {
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      });
+      const response = await apiClient.put(
+        `/students/${studentId}`,
+        studentData
+      );
       return response.data;
     } catch (error) {
+      console.error("Failed to update student:", error);
       throw new Error(`Failed to update student: ${error.message}`);
     }
   },
@@ -89,9 +88,34 @@ export const studentAPI = {
       const response = await apiClient.delete(`/students/${studentId}`);
       return response.data;
     } catch (error) {
+      console.error("Failed to delete student:", error);
       throw new Error(`Failed to delete student: ${error.message}`);
     }
-  }
+  },
+
+  // Get students with due fees today (raw list)
+  getDueStudents: async () => {
+    try {
+      const res = await apiClient.get("/students/due-fees");
+      return res.data;
+    } catch (error) {
+      console.error("Failed to fetch students with due fees:", error);
+      throw new Error(
+        `Failed to fetch students with due fees: ${error.message}`
+      );
+    }
+  },
+
+  // Get students with due fees + WhatsApp messages
+  getDueFull: async () => {
+    try {
+      const res = await apiClient.get("/students/due-fees-with-messages");
+      return res.data;
+    } catch (error) {
+      console.error("Failed to fetch due fee details:", error);
+      throw new Error(`Failed to fetch due fee details: ${error.message}`);
+    }
+  },
 };
 
 // Fee API functions
@@ -99,9 +123,10 @@ export const feeAPI = {
   // Get all fee records
   getAllFeeRecords: async () => {
     try {
-      const response = await apiClient.get('/fees');
+      const response = await apiClient.get("/fees");
       return response.data;
     } catch (error) {
+      console.error("Failed to fetch fee records:", error);
       throw new Error(`Failed to fetch fee records: ${error.message}`);
     }
   },
@@ -109,9 +134,10 @@ export const feeAPI = {
   // Get due fees
   getDueFees: async () => {
     try {
-      const response = await apiClient.get('/fees/due');
+      const response = await apiClient.get("/fees/due");
       return response.data;
     } catch (error) {
+      console.error("Failed to fetch due fees:", error);
       throw new Error(`Failed to fetch due fees: ${error.message}`);
     }
   },
@@ -119,42 +145,90 @@ export const feeAPI = {
   // Add fee record
   addFeeRecord: async (feeData) => {
     try {
-      const response = await apiClient.post('/fees', feeData, {
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      });
+      const response = await apiClient.post("/fees", feeData);
       return response.data;
     } catch (error) {
-      throw new Error(`Failed to add fee record: ${error.message}`);
+      console.error("Failed to add fee record:", error);
+      const msg =
+        error.response?.data?.message || error.response?.data || error.message;
+      throw new Error(`Failed to add fee record: ${msg}`);
     }
-  }
+  },
+
+  // Update fee record
+  updateFeeRecord: async (feeId, feeData) => {
+    try {
+      const response = await apiClient.put(`/fees/${feeId}`, feeData);
+      return response.data;
+    } catch (error) {
+      console.error("Failed to update fee record:", error);
+      throw new Error(`Failed to update fee record: ${error.message}`);
+    }
+  },
+
+  // Delete fee record
+  deleteFeeRecord: async (feeId) => {
+    try {
+      const response = await apiClient.delete(`/fees/${feeId}`);
+      return response.data;
+    } catch (error) {
+      console.error("Failed to delete fee record:", error);
+      throw new Error(`Failed to delete fee record: ${error.message}`);
+    }
+  },
+
+  // Get fees by student ID
+  getFeesByStudentId: async (studentId) => {
+    try {
+      const response = await apiClient.get(`/fees/student/${studentId}`);
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch student fees:", error);
+      throw new Error(`Failed to fetch student fees: ${error.message}`);
+    }
+  },
+
+  // Mark fee as paid - CORRECTED ENDPOINT
+  markFeeAsPaid: async (feeId) => {
+    try {
+      console.log("🚀 Marking fee as paid:", feeId);
+      const response = await apiClient.put(`/fees/${feeId}/mark-paid`);
+      console.log("✅ Fee marked as paid successfully:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("❌ Failed to mark fee as paid:", error);
+      throw new Error(`Failed to mark fee as paid: ${error.message}`);
+    }
+  },
 };
 
-// Test API connection (only GET request)
+// Test API connection
 export const testConnection = async () => {
   try {
-    console.log('🔍 Testing API connection...');
-    const response = await apiClient.get('/students');
-    console.log('✅ API Response:', response);
-    
-    return { 
-      success: true, 
-      message: `Connected! Found ${response.data.length} students` 
+    console.log("🔍 Testing API connection...");
+    const response = await apiClient.get("/students");
+    console.log("✅ API Response:", response);
+
+    return {
+      success: true,
+      message: `Connected! Found ${response.data.length} students`,
     };
   } catch (error) {
-    console.error('❌ API Error Details:', error);
-    
-    if (error.code === 'ECONNREFUSED') {
-      return { success: false, message: 'Backend not running on port 8080' };
+    console.error("❌ API Error Details:", error);
+
+    if (error.code === "ECONNREFUSED") {
+      return { success: false, message: "Backend not running on port 8080" };
     }
     if (error.response?.status === 404) {
-      return { success: false, message: 'API endpoint not found' };
+      return { success: false, message: "API endpoint not found" };
     }
     if (error.response?.status === 415) {
-      return { success: false, message: 'Unsupported Media Type - Fixed!' };
+      return {
+        success: false,
+        message: "Unsupported Media Type - Check backend",
+      };
     }
-    
+
     return { success: false, message: `Error: ${error.message}` };
   }
 };
