@@ -255,24 +255,24 @@
                             <input type="text" id="rollNumber" required>
                         </div>
                         <div class="form-group">
-                            <label for="email">Email</label>
-                            <input type="email" id="email">
+                            <label for="email">Email *</label>
+                            <input type="email" id="email" required>
                         </div>
                         <div class="form-group">
-                            <label for="phone">Student Phone</label>
-                            <input type="tel" id="phone">
+                            <label for="phone">Student Phone *</label>
+                            <input type="tel" id="phone" required>
                         </div>
                         <div class="form-group">
-                            <label for="parentName">Parent Name</label>
-                            <input type="text" id="parentName">
+                            <label for="parentName">Parent Name *</label>
+                            <input type="text" id="parentName" required>
                         </div>
                         <div class="form-group">
                             <label for="parentPhone">Parent Phone *</label>
                             <input type="tel" id="parentPhone" required>
                         </div>
                         <div class="form-group">
-                            <label for="className">Class</label>
-                            <select id="className">
+                            <label for="className">Class *</label>
+                            <select id="className" required>
                                 <option value="">Select Class</option>
                                 <option value="Class 1">Class 1</option>
                                 <option value="Class 2">Class 2</option>
@@ -286,6 +286,22 @@
                                 <option value="Class 10">Class 10</option>
                                 <option value="Class 11">Class 11</option>
                                 <option value="Class 12">Class 12</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="department">Department *</label>
+                            <select id="department" required>
+                                <option value="">Select Department</option>
+                                <option value="Mathematics">Mathematics</option>
+                                <option value="Science">Science</option>
+                                <option value="English">English</option>
+                                <option value="Social Studies">Social Studies</option>
+                                <option value="Computer Science">Computer Science</option>
+                                <option value="Physics">Physics</option>
+                                <option value="Chemistry">Chemistry</option>
+                                <option value="Biology">Biology</option>
+                                <option value="Commerce">Commerce</option>
+                                <option value="Arts">Arts</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -324,7 +340,7 @@
     </div>
 
     <script>
-        const API_BASE = '/students'; // Spring Boot serves from same domain
+        const API_BASE = '/api/students'; // Spring Boot serves from same domain
 
         // Initialize page
         window.onload = function() {
@@ -346,11 +362,12 @@
             const student = {
                 name: document.getElementById('name').value.trim(),
                 rollNumber: document.getElementById('rollNumber').value.trim(),
-                email: document.getElementById('email').value.trim() || null,
-                phone: document.getElementById('phone').value.trim() || null,
-                parentName: document.getElementById('parentName').value.trim() || null,
+                email: document.getElementById('email').value.trim(),
+                phone: document.getElementById('phone').value.trim(),
+                parentName: document.getElementById('parentName').value.trim(),
                 parentPhone: document.getElementById('parentPhone').value.trim(),
-                className: document.getElementById('className').value || null,
+                department: document.getElementById('department').value,
+                className: document.getElementById('className').value,
                 joiningDate: document.getElementById('joiningDate').value,
                 monthlyFee: parseFloat(document.getElementById('monthlyFee').value),
                 discountPercent: parseFloat(document.getElementById('discountPercent').value) || 0.0
